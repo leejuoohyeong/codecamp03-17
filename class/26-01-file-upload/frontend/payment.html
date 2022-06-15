@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>결재페이지</title>
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- jQuery -->
+    <script
+      type="text/javascript"
+      src="https://code.jquery.com/jquery-1.12.4.min.js"
+    ></script>
+    <!-- iamport.payment.js -->
+    <script
+      type="text/javascript"
+      src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"
+    ></script>
+    <script>
+      function requestPay() {
+        const amount = document.getElementById("qqq").value;
+
+        const IMP = window.IMP; // 생략 가능
+        IMP.init("imp74659112"); // Example: imp00000000
+        IMP.request_pay(
+          {
+            // param
+            pg: "html5_inicis",
+            pay_method: "card", //vbank 가상계좌
+            //   merchant_uid: "ORD20180131-0000011", //중복되면 에러남 지우면 자동으로 만들어지기 때문에 겹칠일이 없음
+            name: "노르웨이 회전 의자",
+            amount: amount,
+            buyer_email: "gildong@gmail.com",
+            buyer_name: "홍길동",
+            buyer_tel: "010-4242-4242",
+            buyer_addr: "서울특별시 강남구 신사동",
+            buyer_postcode: "01181",
+          },
+          function (rsp) {
+            // callback
+            if (rsp.success) {
+              // 결제 성공 시 로직,
+              console.log(rep);
+              axios.post(
+                "http://localhost:3000/graphql",
+                {
+                  query: `
+                  mutation{
+                    createPointTransaction(impUid:"${rsp.imp_uid}", amount: ${rsp.paid_amount}){
+                      id
+                    }
+                  }
+                `,
+                },
+                {
+                  headers: {
+                    Authorization:
+                      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im9vb0BuYXZlci5jb20iLCJzdWIiOiJlZWMyYmRjYS0zYWI1LTQ3NzgtODQ0NC02MjUxZmVkOTEzYTYiLCJpYXQiOjE2NTQ3Njg1MTYsImV4cCI6MTY1NDc3MjExNn0.xss81WCKA2udBr5QjsQ71DviRkA7wfihvqNrE7fe8kE",
+                  },
+                }
+              );
+              // 우리 백엔드 API 전송하기
+              alert("결재에 성공했습니다!!");
+            } else {
+              // 결제 실패 시 로직,
+              alert("결재에 실패했습니다!!");
+            }
+          }
+        );
+      }
+    </script>
+  </head>
+  <body>
+    결제할금액:<input type="text" id="qqq" />
+    <button onclick="requestPay()">결재하기</button>
+  </body>
+</html>
