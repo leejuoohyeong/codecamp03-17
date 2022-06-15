@@ -11,6 +11,7 @@ const fetchData = async () => {
       resolve("성공!!");
     }, 3000);
   });
+  let a = 0
 
   await new Promise((resolve, reject) => {
     setTimeout(() => {
