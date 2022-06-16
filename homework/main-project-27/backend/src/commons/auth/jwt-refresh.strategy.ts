@@ -1,26 +1,42 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-jwt';
+import { Cache } from 'cache-manager';
+import { CACHE_MANAGER, Inject, UnauthorizedException } from '@nestjs/common';
 
-// 'myGuard' is from user.resolver.ts -- see fetchUser()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, 'refresh') {
-  constructor() {
+  constructor(
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
+  ) {
     super({
+      //인가에 성공하면 아래의 validate가 작동합니다.
       jwtFromRequest: (req) => {
         const cookie = req.headers.cookie;
-        const refreshToken = cookie.replace("refreshToken=", "");
-        // console.log(cookie);
-        return refreshToken;
+        if (cookie) return cookie.replace('refreshToken=', '');
       },
       secretOrKey: 'myRefreshKey',
+      passReqToCallback: true,
     });
   }
 
-  // 위에꺼가 통과하면 validate() 실행
-  validate(payload) {
-    console.log(payload); // email: a@aaa.com, sub (uuid): qoweirjodfj-12430194
+  async validate(req, payload) {
+    const refreshToken = await req.headers.authorization.replace(
+      'refreshToken=',
+      '',
+    );
+    const is_refreshToken = await this.cacheManager.get(
+      `refreshToken:${refreshToken},
+    `);
+
+    if (is_refreshToken) throw new UnauthorizedException();
+
+    console.log(payload); // email: c@c.com, sub: woiejfoiwf-12314sd
     return {
-        email: payload.email,
-        id: payload.sub
+      email: payload.email,
+      id: payload.sub,
     };
   }
 }
+
+
+

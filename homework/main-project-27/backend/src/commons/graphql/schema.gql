@@ -78,6 +78,7 @@ type Query {
 type Mutation {
   uploadFile(files: [Upload!]!): [String!]!
   login(email: String!, password: String!): String!
+  logout: String!
   restoreAccessToken: String!
   createBoard(writer: String, title: String!, contents: String!, createBoardInput: CreateBoardInput!): String!
   createPaymentTransaction(impUid: String!, amount: Float!): PaymentTransaction!

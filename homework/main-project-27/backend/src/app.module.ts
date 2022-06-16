@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { CacheModule, Module } from '@nestjs/common';
 import { BoardModule } from './apis/boards/board.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -9,6 +9,8 @@ import { UserModule } from './apis/users/user.module';
 import { AuthModule } from './apis/auth/auth.module';
 import { PaymentTransactionModule } from './apis/payment/paymentTransaction.module';
 import { FileModule } from './apis/file/file.module';
+import * as redisStore from 'cache-manager-redis-store';
+import { RedisClientOptions } from 'redis'
 
 @Module({
   imports: [
@@ -26,15 +28,21 @@ import { FileModule } from './apis/file/file.module';
     }),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
+      host: 'my-database',
       port: 3306,
       username: 'root',
-      password: 'chqh456!',
-      database: 'myproject03',
+      password: 'root',
+      database: 'mydocker03',
       entities: [__dirname + '/apis/**/*.entity.*'], //apis폴더의 모든 파일 들중 .entitiy.ts로  끝나는 모든것을 가져옵니다
       synchronize: true,
       logging: true,
     }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      url:'redis://my-redis:6379',
+      isGlobal:true,
+    }),
+    
   ],
 })
 export class AppModule {}

@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { ProductSaleslocation } from '../productSaleslocation/entites/productSaleslocation.entity';
 import { ProductTag } from '../productTags/entities/productTag.entity';
 import { Product } from './entities/product.entity';
-import { Image } from '../image/entities/Image.entity';
+import { Image } from '../Image/entities/Image.entity';
 
 @Injectable()
 export class ProductService {
