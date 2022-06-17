@@ -37,3 +37,4 @@ lerna-debug.log*
 .env
 
 graphic-pattern-352601-ae61233cff6c.json
+gcp-bigquery.json
