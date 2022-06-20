@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <title>결재페이지</title>
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- jQuery -->
+    <script
+      type="text/javascript"
+      src="https://code.jquery.com/jquery-1.12.4.min.js"
+    ></script>
+    <!-- iamport.payment.js -->
+    <script
+      type="text/javascript"
+      src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"
+    ></script>
+    <script>
+      function requestPay() {
+        const amount = document.getElementById("qqq").value;
+
+        const IMP = window.IMP; // 생략 가능
+        IMP.init("imp74659112"); // Example: imp00000000
+        IMP.request_pay(
+          {
+            // param
+            pg: "html5_inicis",
+            pay_method: "card", //vbank 가상계좌
+            //   merchant_uid: "ORD20180131-0000011", //중복되면 에러남 지우면 자동으로 만들어지기 때문에 겹칠일이 없음
+            name: "승원이 개부자",
+            amount: amount,
+            buyer_email: "ableaiden707@gmail.com",
+            buyer_name: "이주형",
+            buyer_tel: "010-2324-9277",
+            buyer_addr: "서울특별시 강남구 신사동",
+            buyer_postcode: "01181",
+          },
+          function (rsp) {
+            // callback
+            if (rsp.success) {
+              // 결제 성공 시 로직,
+              console.log(rsp);
+              axios.post(
+                "http://localhost:3000/graphql",
+                {
+                  query: `
+                  mutation{
+                    createPaymentTransaction(impUid:"${rsp.imp_uid}", amount: ${rsp.paid_amount}){
+                      id
+                    }
+                  }
+                `,
+                },
+                {
+                  headers: {
+                    Authorization:
+                      "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1tbUBuYXZlci5jb20iLCJzdWIiOiI4ZjcyOGZjOS1iNTU3LTQ2NzUtYmEyNy03MTNiNTEwYTNjMDQiLCJpYXQiOjE2NTUxNjQ5NTgsImV4cCI6MTY1NjM3NDU1OH0.AARJhvHSiizQSoR8FbH3edu1UiVEB7MhSJHoLlahnXg",
+                  },
+                }
+              );
+              // 우리 백엔드 API 전송하기
+              alert("결재에 성공했습니다!!");
+            } else {
+              // 결제 실패 시 로직,
+              alert("결재에 실패했습니다!!");
+            }
+          }
+        );
+      }
+
+      async function cancelPay() {
+        const toBeCanceledAmount =
+          document.getElementById("cancelAmount").value;
+        const toBeCanceledUid = document.getElementById("cancelId").value;
+        const toBeCanceledReason =
+          document.getElementById("cancelReason").value;
+
+        const { data } = await axios.post(
+          "http://localhost:3000/graphql",
+          {
+            query: `
+                  mutation{
+                    cancelPaymentTransaction(impUid:"${toBeCanceledUid}",reason:"${toBeCanceledReason}",cancelAmount:${toBeCanceledAmount}){
+                      id
+                    }
+                  }
+                `,
+          },
+          {
+            headers: {
+              Authorization:
+                "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1tbUBuYXZlci5jb20iLCJzdWIiOiI4ZjcyOGZjOS1iNTU3LTQ2NzUtYmEyNy03MTNiNTEwYTNjMDQiLCJpYXQiOjE2NTQ5Mjc2NDQsImV4cCI6MTY1NjEzNzI0NH0.Vv3YimSPQdHwNpemvXyqbJzlsfiqvJ9uHtdzHKrEhYo",
+            },
+          }
+        );
+
+        if (data.errors) {
+          alert(data.errors[0].message);
+        }
+
+        console.log(data.data);
+        if (data.data != null) {
+          alert(`환불 성공!`);
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div>
+      결제할금액:<input type="text" id="qqq" />
+      <button onclick="requestPay()">결재하기</button>
+    </div>
+
+    <div>
+      환불할 ID:<input type="text" id="cancelId" /> 환불사유:<input
+        type="text"
+        id="cancelReason"
+      />
+      환불금액:<input type="number" id="cancelAmount" />
+      <button onclick="cancelPay()">환불하기</button>
+    </div>
+  </body>
+</html>
