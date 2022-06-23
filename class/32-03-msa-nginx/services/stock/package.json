@@ -1,0 +1,13 @@
+{
+  "name": "pwd",
+  "version": "cd ..",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start:dev": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}

@@ -1,0 +1,28 @@
+version: "3.7"
+
+services:
+  api-gateway:
+    image: nginx:latest
+    volumes:
+      - ./api-gateway/default.conf:/etc/nginx/conf.d/default.conf
+    ports:
+      - 80:80
+    # build:
+    #   context: ./api-gateway
+    #   dockerfile: Dockerfile
+    # volumes:
+    #   - ./api-gateway/src:/api-gateway/src
+    # ports:
+    #   - 3000:3000
+
+  auth-service:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/auth/src:/auth-service/src
+
+  stock-service:
+    build:
+      context: ./services/stock
+      dockerfile: Dockerfile
