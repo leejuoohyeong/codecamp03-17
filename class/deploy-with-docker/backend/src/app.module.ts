@@ -32,7 +32,7 @@ import { FileModule } from './apis/file/file.module';
       port: 3306,
       username: 'root',
       password: 'root',
-      database: 'myproject03',
+      database: 'mydocker03',
       entities: [__dirname + '/apis/**/*.entity.*'], //apis폴더의 모든 파일 들중 .entitiy.ts로  끝나는 모든것을 가져옵니다
       synchronize: true,
       logging: true,
