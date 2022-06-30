@@ -10,6 +10,7 @@ import { AuthModule } from './apis/auth/auth.module';
 // import { PointTransactionModule } from './apis/pointTransaction/pointTransaction.module';
 import { PaymentMoudle } from './apis/payment/payment.module';
 import { FileModule } from './apis/file/file.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -38,5 +39,6 @@ import { FileModule } from './apis/file/file.module';
       logging: true,
     }),
   ],
+  controllers: [AppController],
 })
 export class AppModule {}
